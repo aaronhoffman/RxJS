@@ -12,22 +12,41 @@
   <div style="height:200px;"></div>
 
   <div>
-    Mouse Down:<span [innerHTML]="mouseDownValue"></span>
+    Mouse Down:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span [innerHTML]="mouseDownValue"></span>
   </div>
 
   <div>
-    Mouse Up:<span [innerHTML]="mouseUpValue"></span>
+    Mouse Up:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <span [innerHTML]="mouseUpValue"></span>
   </div>
 
   <div>
-    Mouse Move:<span [innerHTML]="mouseMoveValue"></span>
+    Mouse Move:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span [innerHTML]="mouseMoveValue"></span>
   </div>
 
   <div>
-    Mouse Down Move:<span [innerHTML]="mouseDownMoveValue"></span>
+    Mouse Down Move:&nbsp;&nbsp;&nbsp;<span [innerHTML]="mouseDownMoveValue"></span>
   </div>
 
   <div #mouseDiv style="height: 400px;background-color: #EEF;font-size: 20px;">
 
   </div>
+
+  <div style="height:200px;"></div>
+
+  <div>
+    Send Message: <input type="text" style="font-size: 24px;" [(ngModel)]="nextMessage" (ngModelChange)="newMessage(nextMessage)"
+    />
+  </div>
+  <br />
+  <br />
+  display 1:
+  <display-message></display-message>
+  <br />
+  <br />
+  display 2:
+  <display-message></display-message>
+  
+
+
 </div>

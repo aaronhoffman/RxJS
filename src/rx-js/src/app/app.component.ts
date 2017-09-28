@@ -2,6 +2,7 @@ import { Component, OnInit, ViewChild, ElementRef, AfterViewInit } from '@angula
 import { MousePoint } from './MousePoint';
 import { Observable } from 'rxjs/Observable';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { MessageService } from './message.service';
 import 'rxjs/add/observable/of';
 import 'rxjs/add/observable/interval';
 import 'rxjs/add/observable/fromEvent';
@@ -40,7 +41,9 @@ export class AppComponent implements OnInit, AfterViewInit {
   mouseMove$: Observable<MousePoint>;
   mouseDownMove$: Observable<MousePoint>;
 
-  constructor() {
+  nextMessage: string;
+
+  constructor(private _messageService: MessageService) {
   }
 
   ngAfterViewInit() {
@@ -130,5 +133,11 @@ export class AppComponent implements OnInit, AfterViewInit {
       .subscribe(x => this.textAreaValue += "\r\nbuffer: " + x);
 
     console.log(sub);
+  }
+
+
+  // message between components with observable example
+  newMessage(msg: string) {
+    this._messageService.sendMessage(msg);
   }
 }
