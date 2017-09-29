@@ -1,12 +1,23 @@
 import { Component, OnInit, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
+import { FormControl } from '@angular/forms';
 import { MousePoint } from './MousePoint';
+import { Comment } from './comment';
+import { Post } from './post';
+
+// include observable
 import { Observable } from 'rxjs/Observable';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { MessageService } from './message.service';
+import { JsonPlaceholderService } from './jsonPlaceholder.service';
+
+// need to add observable operators in addition
 import 'rxjs/add/observable/of';
+import 'rxjs/add/observable/forkJoin';
 import 'rxjs/add/observable/interval';
 import 'rxjs/add/observable/fromEvent';
 import 'rxjs/add/observable/range';
+import 'rxjs/add/operator/concatMap';
+import 'rxjs/add/operator/toArray';
 import 'rxjs/add/operator/take';
 import 'rxjs/add/operator/takeUntil';
 import 'rxjs/add/operator/merge';
@@ -29,21 +40,28 @@ export class AppComponent implements OnInit, AfterViewInit {
   @ViewChild('mouseDiv') mouseDiv: ElementRef;
 
   title: string;
+
+  // text for initial examples
   textAreaValue: string;
 
+  // text for compose mouse event example
   mouseDownValue: string;
   mouseUpValue: string;
   mouseMoveValue: string;
   mouseDownMoveValue: string;
 
+  // observables for compose mouse event example
   mouseDown$: Observable<MousePoint>;
   mouseUp$: Observable<MousePoint>;
   mouseMove$: Observable<MousePoint>;
   mouseDownMove$: Observable<MousePoint>;
 
+  // text for messaging between components example
   nextMessage: string;
 
-  constructor(private _messageService: MessageService) {
+  constructor(
+    private _messageService: MessageService,
+    private _jsonPlaceholderService: JsonPlaceholderService) {
   }
 
   ngAfterViewInit() {
@@ -73,6 +91,7 @@ export class AppComponent implements OnInit, AfterViewInit {
   ngOnInit() {
     this.title = 'RxJS';
     this.textAreaValue = "";
+    this.wireUpReactiveForm();
 
     this.example01();
   }
@@ -139,5 +158,44 @@ export class AppComponent implements OnInit, AfterViewInit {
   // message between components with observable example
   newMessage(msg: string) {
     this._messageService.sendMessage(msg);
+  }
+
+
+  // service call examples
+  serviceResult: string = ""
+
+  onGetCommentsClick() {
+    this._jsonPlaceholderService.getAllComments()
+      .subscribe(x => this.serviceResult = this.getUnique() + '\r\n\r\n'
+        + x.map(x => x.body).join('\r\n\r\n-'));
+  }
+
+  onPostsAndCommentsClick() {
+    Observable.forkJoin(
+      this._jsonPlaceholderService.getAllPosts(),
+      this._jsonPlaceholderService.getAllComments()
+      // can have more items...
+    )
+      .subscribe(x => console.log(x));
+  }
+
+  onPostsWithCommentsClick() {
+    this._jsonPlaceholderService.getPostsWithComments()
+      .toArray()
+      .subscribe(x => console.log(x));
+  }
+
+  getUnique() {
+    return (new Date().getMilliseconds()) + '';
+  }
+
+  // reactive form examples
+  postId = new FormControl();
+  reactiveFormResult: string = '';
+  wireUpReactiveForm() {
+    this.postId.valueChanges
+    .debounceTime(3000)
+    .concatMap(x => this._jsonPlaceholderService.getPost(x))
+    .subscribe(x => this.reactiveFormResult = JSON.stringify(x));
   }
 }
