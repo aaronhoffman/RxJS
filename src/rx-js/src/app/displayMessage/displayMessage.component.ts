@@ -28,9 +28,11 @@ export class DisplayMessageComponent implements OnInit {
     }
 
     ngOnInit() {
+        // note: gets the observable of the MessageService's BehaviorSubject
         this.message$ = this._messageService.getMessages();
 
         // subscribe to all
+        // note: leave this as is, uncomment scenario below
         this.message$.subscribe(x => this.lastMessage = x);
 
         // take 10
@@ -59,7 +61,6 @@ export class DisplayMessageComponent implements OnInit {
         //     .debounceTime(3000)
         //     .distinctUntilChanged()
         //     .subscribe(x => this.lastMessage2 = x + " " + this.getUnique());
-
 
     }
 

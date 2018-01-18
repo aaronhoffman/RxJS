@@ -19,35 +19,40 @@
     </h1>
   </div>
 
+  
+  <!-- Initial Examples Section -->
   <div>
-    <textarea [(ngModel)]="textAreaValue" style="width: 90%; height: 400px; font-size: 24px;"></textarea>
+    <textarea [(ngModel)]="textAreaValue" style="width: 60%; height: 400px; font-size: 24px;"></textarea>
   </div>
 
   <div style="height:200px;"></div>
 
+
+  <!-- Mouse Move Section -->
   <div>
     <span class="mousePointLabel">Mouse Down:</span>
     <span [innerHTML]="mouseDownValue"></span>
   </div>
-  <div>
+  <div style="margin-top: 10px;">
     <span class="mousePointLabel">Mouse Up:</span>
     <span [innerHTML]="mouseUpValue"></span>
   </div>
-  <div>
+  <div style="margin-top: 10px;">
     <span class="mousePointLabel">Mouse Move:</span>
     <span [innerHTML]="mouseMoveValue"></span>
   </div>
-  <div>
+  <div style="margin-top: 10px;">
     <span class="mousePointLabel">Mouse Down Move:</span>
     <span [innerHTML]="mouseDownMoveValue"></span>
   </div>
 
-  <div #mouseDiv style="height: 400px;background-color: #EEF;font-size: 20px;">
-
+  <div #mouseDiv style="width: 60%; height: 400px; background-color: #EEF; font-size: 20px;">
   </div>
 
   <div style="height:200px;"></div>
 
+
+  <!-- Send Message Section -->
   <div>
     Send Message:
     <input type="text" style="font-size: 24px;" [(ngModel)]="nextMessage" (ngModelChange)="newMessage(nextMessage)" />
@@ -63,6 +68,8 @@
 
   <div style="height:200px;"></div>
 
+
+  <!-- Service Calls Section -->
   <h3>Service Calls</h3>
   <br />
   <button type="button" (click)="onGetCommentsClick()">Get Comments</button><br />
@@ -72,13 +79,17 @@
   <button type="button" (click)="onPostsWithCommentsClick()">Get Posts WITH Comments</button><br />
   <br />
 
-  <textarea [(ngModel)]="serviceResult" style="width: 90%; height: 400px; font-size: 24px;"></textarea>
+  <textarea [(ngModel)]="serviceResult" style="width: 60%; height: 400px; font-size: 24px;"></textarea>
 
   <div style="height:200px;"></div>
 
 
+  <!-- Demo Reactive Forms Section -->
   PostId: <input type="text" [formControl]="postId">
-  <div [innerHTML]="reactiveFormResult"></div>
+  <div
+    style="background-color: #ccc; margin-top: 10px; padding: 10px; width: 60%"
+    [innerHTML]="reactiveFormResult">
+  </div>
 
 
   <div style="height:400px;"></div>

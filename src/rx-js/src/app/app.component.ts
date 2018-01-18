@@ -7,10 +7,12 @@ import { Post } from './post';
 // include observable
 import { Observable } from 'rxjs/Observable';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+
+// my services
 import { MessageService } from './message.service';
 import { JsonPlaceholderService } from './jsonPlaceholder.service';
 
-// need to add observable operators in addition
+// need to add observable operators in addition to rxjs/Observable above
 import 'rxjs/add/observable/of';
 import 'rxjs/add/observable/forkJoin';
 import 'rxjs/add/observable/interval';
@@ -78,8 +80,13 @@ export class AppComponent implements OnInit, AfterViewInit {
       .fromEvent(this.mouseDiv.nativeElement, 'mousemove')
       .map((e: MouseEvent) => <MousePoint>{ x: e.offsetX, y: e.offsetY });
 
+    // note: demo multiple subs
+    this.mouseDown$.subscribe(x => console.log(x));
+
     // compose observable from others
-    this.mouseDownMove$ = this.mouseDown$.mergeMap(x => this.mouseMove$.takeUntil(this.mouseUp$));
+    // breakdown: every time mouseDown happens, create a new observable from mouseMove, takeUntil mouseUp
+    this.mouseDownMove$ = this.mouseDown$
+      .mergeMap(x => this.mouseMove$.takeUntil(this.mouseUp$));
 
     // wire up subscriptions
     this.mouseDown$.subscribe(x => this.mouseDownValue = "x: " + x.x + "; y: " + x.y);
@@ -93,11 +100,12 @@ export class AppComponent implements OnInit, AfterViewInit {
     this.textAreaValue = "";
     this.wireUpReactiveForm();
 
-    this.example01();
+    //this.example01();
   }
 
   // basic
   example01() {
+    // create an Observable that emits a sequence of integers spaced by a given time interval
     const obs = Observable.interval(1000);
 
     obs.subscribe(x => this.textAreaValue += "\r\ninterval: " + x);
@@ -105,11 +113,15 @@ export class AppComponent implements OnInit, AfterViewInit {
 
   // filter
   example02() {
-    const obs = Observable.interval(1000);
+    var obs = Observable.interval(1000);
 
     obs
       .filter(x => x % 2 === 0)
       .subscribe(x => this.textAreaValue += "\r\ninterval: " + x);
+
+    // demo composability
+    // obs = obs.filter(x => x % 2 === 0);
+    // obs.subscribe(x => this.textAreaValue += "\r\ninterval: " + x);
   }
 
   // take
@@ -124,19 +136,19 @@ export class AppComponent implements OnInit, AfterViewInit {
       () => this.textAreaValue += "\r\ncomplete");
   }
 
-  // map, projection
+  // map, aka: projection
   example04() {
     const obs = Observable.interval(1000);
 
     obs
       .map(x => "obs: " + x)
-      .subscribe(x => this.textAreaValue = "\r\ninterval: " + x);
+      .subscribe(x => this.textAreaValue += "\r\ninterval: " + x);
   }
 
-  // merge, join
+  // merge
   example05() {
-    let obs1 = Observable.interval(1000).map(x => "obs1: " + 1 * (x + 1));
-    let obs5 = Observable.interval(5000).map(x => "obs5: " + 5 * (x + 1));
+    let obs1 = Observable.interval(1000).map(x => "obs1: " + x);
+    let obs5 = Observable.interval(5000).map(x => "obs5: " + x);
 
     obs1
       .merge(obs5)
@@ -151,7 +163,8 @@ export class AppComponent implements OnInit, AfterViewInit {
       .bufferTime(3000)
       .subscribe(x => this.textAreaValue += "\r\nbuffer: " + x);
 
-    console.log(sub);
+    // note: result of .subscribe() call is a Subscription object
+    //sub.unsubscribe()
   }
 
 
@@ -171,17 +184,27 @@ export class AppComponent implements OnInit, AfterViewInit {
   }
 
   onPostsAndCommentsClick() {
-    Observable.forkJoin(
+    // forkJoin: When all observables complete, emit the last emitted value from each.
+    // similar to Promise.all()
+    var obs = Observable.forkJoin(
       this._jsonPlaceholderService.getAllPosts(),
       this._jsonPlaceholderService.getAllComments()
       // can have more items...
-    )
-      .subscribe(x => console.log(x));
+    ).shareReplay();
+
+    // note: if there are no subscribers, requests will never fire
+    // if there are multiple subscribers (and no .shareReplay()), it will fire twice
+
+    // `x` will be [Post[], Comment[]]
+    obs.subscribe(x => console.log(x));
+
+    // flatten posts and comments 
+    obs.subscribe(x => this.serviceResult = this.getUnique() + '\r\n\r\n'
+      + x[0].map(x => x.body).concat(x[1].map(x => x.body)).join('\r\n\r\n'));
   }
 
   onPostsWithCommentsClick() {
     this._jsonPlaceholderService.getPostsWithComments()
-      .toArray()
       .subscribe(x => console.log(x));
   }
 
@@ -194,8 +217,8 @@ export class AppComponent implements OnInit, AfterViewInit {
   reactiveFormResult: string = '';
   wireUpReactiveForm() {
     this.postId.valueChanges
-    .debounceTime(3000)
-    .concatMap(x => this._jsonPlaceholderService.getPost(x))
-    .subscribe(x => this.reactiveFormResult = JSON.stringify(x));
+      .debounceTime(3000)
+      .concatMap(x => this._jsonPlaceholderService.getPost(x))
+      .subscribe(x => this.reactiveFormResult = JSON.stringify(x));
   }
 }
